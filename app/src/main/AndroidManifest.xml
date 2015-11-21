@@ -32,7 +32,7 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <provider
             android:name="com.facebook.FacebookContentProvider"
-            android:authorities="com.facebook.app.FacebookContentProvider"
+            android:authorities="com.facebook.app.FacebookContentProvider161226850898892"
             android:exported="true" />
     </application>
 
