@@ -42,6 +42,7 @@ import com.facebook.share.ShareApi;
 import com.facebook.share.Sharer;
 import com.facebook.share.model.ShareLinkContent;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.security.MessageDigest;
@@ -195,6 +196,13 @@ public class MainActivity extends AppCompatActivity
                                     public void onCompleted(JSONObject object,
                                                             GraphResponse response) {
                                         Log.d("LOG", "response:- " + response.toString());
+                                        String email = null;
+                                        try {
+                                            email = response.getJSONObject().get("email").toString();
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                        Log.e("LOG", "email:- " + email);
                                     }
                                 }
                         );
@@ -323,6 +331,8 @@ public class MainActivity extends AppCompatActivity
             userName.setText(profile.getName());
             postLinkButton.setEnabled(true);
             postPictureButton.setEnabled(true);
+            System.out.println(profile.getProfilePictureUri(20, 20));
+            System.out.println(profile.getLinkUri());
         } else {
             profilePictureView.setProfileId(null);
             userName.setText(null);
