@@ -2,10 +2,15 @@ package com.tourismkkc;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -24,6 +29,8 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.ProfileTracker;
 import com.facebook.appevents.AppEventsLogger;
@@ -35,7 +42,13 @@ import com.facebook.share.ShareApi;
 import com.facebook.share.Sharer;
 import com.facebook.share.model.ShareLinkContent;
 
+import org.json.JSONObject;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+
+import java.util.NoSuchElementException;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -166,12 +179,30 @@ public class MainActivity extends AppCompatActivity
 
         callbackManager = CallbackManager.Factory.create();
 
+        getUserInfo();
+
         LoginManager.getInstance().registerCallback(callbackManager,
                 new FacebookCallback<LoginResult>() {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
                         handlePendingAction();
                         updateUI();
+
+                        GraphRequest request = GraphRequest.newMeRequest(
+                                loginResult.getAccessToken(),
+                                new GraphRequest.GraphJSONObjectCallback() {
+                                    @Override
+                                    public void onCompleted(JSONObject object,
+                                                            GraphResponse response) {
+                                        Log.d("LOG", "response:- " + response.toString());
+                                    }
+                                }
+                        );
+                        Bundle bundle = new Bundle();
+                        bundle.putString("fields", "id,name,email,gender, birthday");
+                        request.setParameters(bundle);
+                        Log.d("LOG", "bundle:- " + bundle.toString());
+                        request.executeAsync();
                     }
 
                     @Override
@@ -182,6 +213,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onError(FacebookException error) {
                         updateUI();
+                        Log.d("LOG", error.toString());
                     }
                 });
 
@@ -263,6 +295,22 @@ public class MainActivity extends AppCompatActivity
                 performPublish(PendingAction.POST_LINK);
             }
         });
+
+    }
+
+    private void getUserInfo() {
+
+        try {
+            PackageInfo info = getPackageManager().getPackageInfo("com.tourismkkc", PackageManager.GET_SIGNATURES);
+            for (Signature signature : info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                Log.d("KeyHash:- ", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+            }
+        } catch (PackageManager.NameNotFoundException | NoSuchAlgorithmException ignored) {
+
+        }
+
 
     }
 
@@ -359,8 +407,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        accessTokenTracker.stopTracking();
         profileTracker.stopTracking();
     }
 
