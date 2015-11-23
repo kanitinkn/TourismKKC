@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.util.Base64;
@@ -45,11 +46,27 @@ import com.facebook.share.model.ShareLinkContent;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.NoSuchElementException;
+
+import javax.net.ssl.HttpsURLConnection;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -64,8 +81,201 @@ public class MainActivity extends AppCompatActivity
     private TextView userName;
     private Button postLinkButton;
     private Button postPictureButton;
+    private FloatingActionButton fab;
 
+    private String keyHash = null;
     private static final String PERMISSION = "publish_actions";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        FacebookSdk.sdkInitialize(this.getApplicationContext());
+
+        callbackManager = CallbackManager.Factory.create();
+
+        getUserInfo();
+
+        LoginManager.getInstance().registerCallback(callbackManager,
+                new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+                        handlePendingAction();
+                        updateUI();
+
+                        GraphRequest request = GraphRequest.newMeRequest(
+                                loginResult.getAccessToken(),
+                                new GraphRequest.GraphJSONObjectCallback() {
+                                    @Override
+                                    public void onCompleted(JSONObject object,
+                                                            GraphResponse response) {
+                                        Log.d("LOG", "response:- " + response.toString());
+                                        String email = null;
+                                        try {
+                                            email = response.getJSONObject().get("email").toString();
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                        Log.d("LOG", "email:- " + email);
+                                        Snackbar.make(fab, keyHash + email, Snackbar.LENGTH_INDEFINITE)
+                                                .setAction("KeyHash", null).show();
+                                    }
+                                }
+                        );
+                        Bundle bundle = new Bundle();
+                        bundle.putString("fields", "id,name,email,gender, birthday");
+
+                        URL url;
+                        HttpURLConnection urlConnection = null;
+
+                        try {
+                            url = new URL("http://tourismkkc.thaihubhosting.com/main/register");
+
+                            urlConnection = (HttpsURLConnection) url.openConnection();
+                            urlConnection.setReadTimeout(10000);
+                            urlConnection.setConnectTimeout(15000);
+                            urlConnection.setRequestMethod("POST");
+                            urlConnection.setDoInput(true);
+                            urlConnection.setDoOutput(true);
+
+                            Uri.Builder builder = new Uri.Builder()
+                                    .appendQueryParameter("user_email", "test@gmail.com")
+                                    .appendQueryParameter("user_password", "test")
+                                    .appendQueryParameter("user_fname", "test")
+                                    .appendQueryParameter("user_lname", "test");
+                            String query = builder.build().getEncodedQuery();
+
+                            OutputStream os = urlConnection.getOutputStream();
+                            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                            writer.write(query);
+                            writer.flush();
+                            writer.close();
+                            os.close();
+
+                            urlConnection.connect();
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        } finally {
+                            try {
+                                if (urlConnection != null) {
+                                    urlConnection.disconnect();
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace(); //If you want further info on failure...
+                            }
+                        }
+
+                        request.setParameters(bundle);
+                        Log.d("LOG", "bundle:- " + bundle.toString());
+                        request.executeAsync();
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        updateUI();
+                    }
+
+                    @Override
+                    public void onError(FacebookException error) {
+                        updateUI();
+                        Log.d("LOG", error.toString());
+                    }
+                }
+
+        );
+
+        setContentView(R.layout.activity_main);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        setSupportActionBar(toolbar);
+
+        fab = (FloatingActionButton)
+
+                findViewById(R.id.fab);
+
+        fab.setOnClickListener(new View.OnClickListener()
+
+                               {
+                                   @Override
+                                   public void onClick(View view) {
+                                       Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                                               .setAction("Action", null).show();
+                                   }
+                               }
+
+        );
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        userName = (TextView)
+
+                findViewById(R.id.user_name);
+
+        profilePictureView = (ProfilePictureView)
+
+                findViewById(R.id.profile_picture);
+
+        postLinkButton = (Button)
+
+                findViewById(R.id.post_link_button);
+
+        postPictureButton = (Button)
+
+                findViewById(R.id.post_picture_button);
+
+
+        // create profileTracker
+        profileTracker = new
+
+                ProfileTracker() {
+                    @Override
+                    protected void onCurrentProfileChanged(Profile oldProfile,
+                                                           Profile currentProfile) {
+                        updateUI();
+                    }
+                }
+
+        ;
+
+        postLinkButton.setOnClickListener(new View.OnClickListener()
+
+                                          {
+                                              @Override
+                                              public void onClick(View v) {
+                                                  performPublish(PendingAction.POST_LINK);
+                                              }
+                                          }
+
+        );
+
+    }
+
+    /*private String getQuery(List<NameValuePair> params) throws UnsupportedEncodingException {
+        StringBuilder result = new StringBuilder();
+        boolean first = true;
+
+        for (NameValuePair pair : params) {
+            if (first)
+                first = false;
+            else
+                result.append("&");
+
+            result.append(URLEncoder.encode(pair.getName(), "UTF-8"));
+            result.append("=");
+            result.append(URLEncoder.encode(pair.getValue(), "UTF-8"));
+        }
+
+        return result.toString();
+    }*/
 
     // ชนิดของการโพสต์ที่รอดำเนินการ
     private enum PendingAction {
@@ -78,6 +288,7 @@ public class MainActivity extends AppCompatActivity
     private PendingAction pendingAction = PendingAction.NONE;
 
     // เมธอดเริ่มต้นกระบวนการโพสต์
+
     private void performPublish(PendingAction action) {
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
 
@@ -107,34 +318,25 @@ public class MainActivity extends AppCompatActivity
 
         //รายละเอียดของลิงค์ที่จะโพสต์ลงเฟสบุ๊ค
         ShareLinkContent content = new ShareLinkContent.Builder()
-                .setContentTitle("idevbear.com")
-                .setContentDescription("ทดสอบโปรแกรม")
+                .setContentTitle("www.idevbear.com")
+                .setContentDescription("TEST")
                 .setContentUrl(Uri.parse("http://www.idevbear.com"))
-                .setImageUrl(Uri.parse("http://postto.me/1b/2rc.jpg"))
+                .setImageUrl(Uri.parse("http://www.3bugs.com/logo.png"))
                 .build();
 
-        if (profile != null && hasPublishPermission()) {
+        if (hasPublishPermission()) {
             ShareApi.share(content, shareCallback);
         } else {
             pendingAction = PendingAction.POST_LINK;
-            LoginManager.getInstance().logInWithReadPermissions(this,
-                    Arrays.asList(
-                            "publish_actions",
-                            "public_profile",
-                            "user_friends",
-                            "email",
-                            "user_birthday",
-                            "user_education_history",
-                            "user_hometown",
-                            "user_location"
-                    ));
+            LoginManager.getInstance().logInWithPublishPermissions(this, Collections.singletonList(PERMISSION)
+            );
         }
     }
 
     private boolean hasPublishPermission() {
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         return accessToken != null &&
-                accessToken.getPermissions().contains("publish_actions");
+                accessToken.getPermissions().contains(PERMISSION);
     }
 
     private FacebookCallback<Sharer.Result> shareCallback =
@@ -170,142 +372,6 @@ public class MainActivity extends AppCompatActivity
                 }
             };
 
-
-    @Override
-
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        FacebookSdk.sdkInitialize(this.getApplicationContext());
-
-        callbackManager = CallbackManager.Factory.create();
-
-        getUserInfo();
-
-        LoginManager.getInstance().registerCallback(callbackManager,
-                new FacebookCallback<LoginResult>() {
-                    @Override
-                    public void onSuccess(LoginResult loginResult) {
-                        handlePendingAction();
-                        updateUI();
-
-                        GraphRequest request = GraphRequest.newMeRequest(
-                                loginResult.getAccessToken(),
-                                new GraphRequest.GraphJSONObjectCallback() {
-                                    @Override
-                                    public void onCompleted(JSONObject object,
-                                                            GraphResponse response) {
-                                        Log.d("LOG", "response:- " + response.toString());
-                                        String email = null;
-                                        try {
-                                            email = response.getJSONObject().get("email").toString();
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
-                                        }
-                                        Log.e("LOG", "email:- " + email);
-                                    }
-                                }
-                        );
-                        Bundle bundle = new Bundle();
-                        bundle.putString("fields", "id,name,email,gender, birthday");
-                        request.setParameters(bundle);
-                        Log.d("LOG", "bundle:- " + bundle.toString());
-                        request.executeAsync();
-                    }
-
-                    @Override
-                    public void onCancel() {
-                        updateUI();
-                    }
-
-                    @Override
-                    public void onError(FacebookException error) {
-                        updateUI();
-                        Log.d("LOG", error.toString());
-                    }
-                });
-
-//        loginButton = (LoginButton) findViewById(R.id.login_button);
-//        loginButton.setReadPermissions(Arrays.asList("public_profile", "user_friends", "email", "user_birthday", "user_education_history", "user_hometown", "user_location"));
-//        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-//
-//            @Override
-//            public void onSuccess(LoginResult loginResult) {
-//                Log.d("LOG", "loginResult: " + loginResult.toString());
-//            }
-//
-//            @Override
-//            public void onCancel() {
-//                Log.d("LOG", "onCancel");
-//            }
-//
-//            @Override
-//            public void onError(FacebookException error) {
-//                Log.d("LOG", "error: " + error.toString());
-//            }
-//        });
-
-        setContentView(R.layout.activity_main);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        userName = (TextView) findViewById(R.id.user_name);
-        profilePictureView = (ProfilePictureView) findViewById(R.id.profile_picture);
-        postLinkButton = (Button) findViewById(R.id.post_link_button);
-        postPictureButton = (Button) findViewById(R.id.post_picture_button);
-
-
-        // create profileTracker
-        profileTracker = new ProfileTracker() {
-            @Override
-            protected void onCurrentProfileChanged(Profile oldProfile,
-                                                   Profile currentProfile) {
-                updateUI();
-            }
-        };
-
-        /*accessTokenTracker = new AccessTokenTracker() {
-            @Override
-            protected void onCurrentAccessTokenChanged(
-                    AccessToken oldAccessToken,
-                    AccessToken currentAccessToken) {
-                // Set the access token using
-                // currentAccessToken when it's loaded or set.
-                Log.d("LOG", "oldAccessToken: " + oldAccessToken.toString());
-                Log.d("LOG", "currentAccessToken: " + currentAccessToken.toString());
-            }
-        };
-        // If the access token is available already assign it.
-        accessToken = AccessToken.getCurrentAccessToken();*/
-
-        postLinkButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                performPublish(PendingAction.POST_LINK);
-            }
-        });
-
-    }
-
     private void getUserInfo() {
 
         try {
@@ -314,6 +380,7 @@ public class MainActivity extends AppCompatActivity
                 MessageDigest md = MessageDigest.getInstance("SHA");
                 md.update(signature.toByteArray());
                 Log.d("KeyHash:- ", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+                keyHash += Base64.encodeToString(md.digest(), Base64.DEFAULT);
             }
         } catch (PackageManager.NameNotFoundException | NoSuchAlgorithmException ignored) {
 
@@ -331,7 +398,9 @@ public class MainActivity extends AppCompatActivity
             userName.setText(profile.getName());
             postLinkButton.setEnabled(true);
             postPictureButton.setEnabled(true);
-            System.out.println(profile.getProfilePictureUri(20, 20));
+
+            // get images
+            System.out.println(profile.getProfilePictureUri(180, 180));
             System.out.println(profile.getLinkUri());
         } else {
             profilePictureView.setProfileId(null);
