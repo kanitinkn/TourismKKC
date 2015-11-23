@@ -125,50 +125,9 @@ public class MainActivity extends AppCompatActivity
                         Bundle bundle = new Bundle();
                         bundle.putString("fields", "id,name,email,gender, birthday");
 
-                        URL url;
-                        HttpURLConnection urlConnection = null;
-
-                        try {
-                            url = new URL("http://tourismkkc.thaihubhosting.com/main/register");
-
-                            urlConnection = (HttpsURLConnection) url.openConnection();
-                            urlConnection.setReadTimeout(10000);
-                            urlConnection.setConnectTimeout(15000);
-                            urlConnection.setRequestMethod("POST");
-                            urlConnection.setDoInput(true);
-                            urlConnection.setDoOutput(true);
-
-                            Uri.Builder builder = new Uri.Builder()
-                                    .appendQueryParameter("user_email", "test@gmail.com")
-                                    .appendQueryParameter("user_password", "test")
-                                    .appendQueryParameter("user_fname", "test")
-                                    .appendQueryParameter("user_lname", "test");
-                            String query = builder.build().getEncodedQuery();
-
-                            OutputStream os = urlConnection.getOutputStream();
-                            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-                            writer.write(query);
-                            writer.flush();
-                            writer.close();
-                            os.close();
-
-                            urlConnection.connect();
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        } finally {
-                            try {
-                                if (urlConnection != null) {
-                                    urlConnection.disconnect();
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace(); //If you want further info on failure...
-                            }
-                        }
-
-                        request.setParameters(bundle);
-                        Log.d("LOG", "bundle:- " + bundle.toString());
-                        request.executeAsync();
+                        //Run API
+                        APIconnect api = new APIconnect();
+                        api.execute("http://tourismkkc.thaihubhosting.com/main/register");
                     }
 
                     @Override
