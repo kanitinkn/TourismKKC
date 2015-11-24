@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -55,16 +56,16 @@ public class ActivityRegisterActivity extends Activity implements View.OnClickLi
                     /* isEmpty = false */
                     if (getStrPassword().equals(getStrConfirm())) {
                         Toast.makeText(getApplicationContext(), "PASSWORD: TRUE", Toast.LENGTH_LONG).show();
+
+                        //Connect API
+                        DataRegister dataRegister = new DataRegister(strEmail, strPassword, strFirst, strLast);
+                        LoadAPI loadAPI = new LoadAPI();
+                        loadAPI.execute(dataRegister);
+
                     } else {
                         Toast.makeText(getApplicationContext(), "PASSWORD: FALSE", Toast.LENGTH_LONG).show();
                     }
                 }
-
-                //Connect API
-                DataRegister dataRegister = new DataRegister(strEmail, strPassword, strFirst, strLast);
-                LoadAPI loadAPI = new LoadAPI();
-                loadAPI.execute(dataRegister);
-
                 break;
             case R.id.register_btn_back:
                 Intent intent = new Intent(getApplicationContext(), ActivityLoginActivity.class);
@@ -140,6 +141,10 @@ public class ActivityRegisterActivity extends Activity implements View.OnClickLi
         @Override
         protected void onPostExecute(APIStatus result) {
             Toast.makeText(getApplicationContext(), apiStatus.getReason(), Toast.LENGTH_LONG).show();
+            if(apiStatus.getStatus().equalsIgnoreCase("success")){
+                Intent intent = new Intent(getApplicationContext(), ActivityLoginActivity.class);
+                startActivity(intent);
+            }
         }
     }
 }
