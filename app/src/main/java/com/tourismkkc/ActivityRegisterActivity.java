@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class ActivityRegisterActivity extends Activity implements View.OnClickListener {
 
@@ -47,9 +48,11 @@ public class ActivityRegisterActivity extends Activity implements View.OnClickLi
                 editStr();
 
                 if (getStrEmail().isEmpty() || getStrPassword().isEmpty() || getStrConfirm().isEmpty() || getStrFirst().isEmpty() || getStrLast().isEmpty()) {
-
+/*false*/
+                    Toast.makeText(getApplicationContext(), "FALSE", Toast.LENGTH_LONG).show();
                 } else {
-
+/*true*/
+                    Toast.makeText(getApplicationContext(), "TRUE", Toast.LENGTH_LONG).show();
                 }
 
                 break;
