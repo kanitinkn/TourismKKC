@@ -37,4 +37,10 @@ dependencies {
 
 //    add library using facebook sdk
     compile 'com.facebook.android:facebook-android-sdk:4.7.0'
+
+    //OkHttp
+    compile 'com.squareup.okhttp:okhttp:2.6.0'
+
+    //GSON
+    compile 'com.google.code.gson:gson:2.3.1'
 }

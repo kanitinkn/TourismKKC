@@ -96,6 +96,9 @@ public class MainActivity extends AppCompatActivity
 
         getUserInfo();
 
+        APIconnect api = new APIconnect();
+        api.execute();
+
         LoginManager.getInstance().registerCallback(callbackManager,
                 new FacebookCallback<LoginResult>() {
                     @Override
@@ -127,7 +130,8 @@ public class MainActivity extends AppCompatActivity
 
                         //Run API
                         APIconnect api = new APIconnect();
-                        api.execute("http://tourismkkc.thaihubhosting.com/main/register");
+//                        api.execute("http://tourismkkc.thaihubhosting.com/main/register");
+
                     }
 
                     @Override
