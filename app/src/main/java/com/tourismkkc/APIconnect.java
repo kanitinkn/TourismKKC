@@ -9,13 +9,14 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 
+public class APIConnect extends AsyncTask<Void, Void, String> {
 
+<<<<<<< HEAD
 /**
  * Created by cbnuke on 11/23/15.
  */
@@ -24,8 +25,12 @@ public class APIconnect extends AsyncTask<Void, Void, String> {
     private String URL_MAIN = "http://192.168.0.132/TourismKKC/main/";
     private String TAG = "CBNUKE_Dev";
     private OkHttpClient okHttpClient = new OkHttpClient();
+=======
+    private String TAG = "DEBUG";
+    private APIStatus apiStatus = new APIStatus();
+>>>>>>> origin/master
 
-    public APIconnect() {
+    public APIConnect() {
 
     }
 
@@ -120,35 +125,34 @@ public class APIconnect extends AsyncTask<Void, Void, String> {
                 .add("user_lname", "Com")
                 .build();
 
-//        RequestBody requestBody = new MultipartBuilder()
-//                .type(MultipartBuilder.FORM)
-//                .addPart(
-//                        Headers.of("Content-Disposition", "form-data; name=\"user_email\""),
-//                        RequestBody.create(null, "test@test.com"))
-//                .addPart(
-//                        Headers.of("Content-Disposition", "form-data; name=\"user_password\""),
-//                        RequestBody.create(null, "1234"))
-//                .addPart(
-//                        Headers.of("Content-Disposition", "form-data; name=\"user_fname\""),
-//                        RequestBody.create(null, "Test"))
-//                .addPart(
-//                        Headers.of("Content-Disposition", "form-data; name=\"user_lname\""),
-//                        RequestBody.create(null, "Com"))
-////                .addPart(
-////                        Headers.of("Content-Disposition", "form-data; name=\"image\""),
-////                        RequestBody.create(MEDIA_TYPE_PNG, new File("website/static/logo-square.png")))
-//                .build();
+        /*RequestBody requestBody = new MultipartBuilder()
+                .type(MultipartBuilder.FORM)
+                .addPart(
+                        Headers.of("Content-Disposition", "form-data; name=\"user_email\""),
+                        RequestBody.create(null, "test@test.com"))
+                .addPart(
+                        Headers.of("Content-Disposition", "form-data; name=\"user_password\""),
+                        RequestBody.create(null, "1234"))
+                .addPart(
+                        Headers.of("Content-Disposition", "form-data; name=\"user_fname\""),
+                        RequestBody.create(null, "Test"))
+                .addPart(
+                        Headers.of("Content-Disposition", "form-data; name=\"user_lname\""),
+                        RequestBody.create(null, "Com"))
+                .addPart(
+                        Headers.of("Content-Disposition", "form-data; name=\"image\""),
+                        RequestBody.create(MEDIA_TYPE_PNG, new File("website/static/logo-square.png")))
+                .build();*/
 
         Request.Builder builder = new Request.Builder();
-        Request request = builder
-                .url(URL)
-                .post(formBody)
-                .build();
+        String URL = "http://192.168.0.132/TourismKKC/main/register";
+        Request request = builder.url(URL).post(formBody).build();
 
         Log.d(TAG, "Start API");
 
         try {
             Response response = okHttpClient.newCall(request).execute();
+
             if (response.isSuccessful()) {
                 return response.body().string();
             } else {
@@ -164,6 +168,7 @@ public class APIconnect extends AsyncTask<Void, Void, String> {
 
     @Override
     protected void onPostExecute(String string) {
+
         super.onPostExecute(string);
         Log.d(TAG, "End API");
         Log.d(TAG, string);
@@ -180,24 +185,26 @@ public class APIconnect extends AsyncTask<Void, Void, String> {
             String reason = objData.getString("reason");
             Log.d(TAG, "REASON:" + reason);
 
-//            JSONArray jArray = jObject.getJSONArray("data");
-//            for (int i = 0; i < jArray.length(); i++) {
-//                try {
-//                    Log.d(TAG, "Loop " + i);
-//                    JSONObject oneObject = jArray.getJSONObject(i);
-//                    // Pulling items from the array
-//                    String oneObjectsItem = oneObject.getString("action");
-//                    String oneObjectsItem2 = oneObject.getString("reason");
-//                    Log.d(TAG, oneObjectsItem);
-//                    Log.d(TAG, oneObjectsItem2);
-//                } catch (JSONException e) {
-//                    // Oops
-//                }
-//            }
+/*            JSONArray jArray = jObject.getJSONArray("data");
+            for (int i = 0; i < jArray.length(); i++) {
+                try {
+                    Log.d(TAG, "Loop " + i);
+                    JSONObject oneObject = jArray.getJSONObject(i);
+                    // Pulling items from the array
+                    String oneObjectsItem = oneObject.getString("action");
+                    String oneObjectsItem2 = oneObject.getString("reason");
+                    Log.d(TAG, oneObjectsItem);
+                    Log.d(TAG, oneObjectsItem2);
+                } catch (JSONException e) {
+                    // Oops
+                }
+            }*/
+
         } catch (JSONException e) {
             e.printStackTrace();
             Log.d(TAG, "ERROR " + e.toString());
         }
+
     }
 }
 
