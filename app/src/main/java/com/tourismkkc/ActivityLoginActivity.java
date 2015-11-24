@@ -39,14 +39,14 @@ public class ActivityLoginActivity extends Activity implements View.OnClickListe
     private ProfileTracker profileTracker;
     private CallbackManager callbackManager;
 
-    private String keyHash = null;
+    private String keyHash;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(this.getApplicationContext());
-
+        setContentView(R.layout.activity_login);
         initInstances();
         initCallbackManager();
         getUserInfo();
@@ -55,12 +55,12 @@ public class ActivityLoginActivity extends Activity implements View.OnClickListe
 
             @Override
             protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
+
                 updateUI();
+
             }
 
         };
-
-        setContentView(R.layout.activity_login);
 
         buttonLogin.setOnClickListener(this);
         buttonRegister.setOnClickListener(this);
