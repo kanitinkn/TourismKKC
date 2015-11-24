@@ -33,7 +33,7 @@ public class ActivityRegisterActivity extends Activity implements View.OnClickLi
         editTextFirst = (EditText) findViewById(R.id.register_edit_first);
         editTextLast = (EditText) findViewById(R.id.register_edit_last);
         buttonRegister = (Button) findViewById(R.id.register_btn_register);
-        editTextLast = (EditText) findViewById(R.id.register_edit_last);
+        buttonBack = (Button) findViewById(R.id.register_btn_back);
 
     }
 
