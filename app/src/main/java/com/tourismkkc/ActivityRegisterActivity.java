@@ -43,6 +43,15 @@ public class ActivityRegisterActivity extends Activity implements View.OnClickLi
         switch (v.getId()) {
 
             case R.id.register_btn_register:
+
+                editStr();
+
+                if (getStrEmail().isEmpty() || getStrPassword().isEmpty() || getStrConfirm().isEmpty() || getStrFirst().isEmpty() || getStrLast().isEmpty()) {
+
+                } else {
+
+                }
+
                 break;
             case R.id.register_btn_back:
                 Intent intent = new Intent(getApplicationContext(), ActivityLoginActivity.class);
@@ -51,5 +60,57 @@ public class ActivityRegisterActivity extends Activity implements View.OnClickLi
 
         }
 
+    }
+
+    private void editStr() {
+
+        setStrEmail(editTextEmail.getText().toString());
+        setStrPassword(editTextpassword.getText().toString());
+        setStrConfirm(editTextConfirm.getText().toString());
+        setStrFirst(editTextFirst.getText().toString());
+        setStrLast(editTextLast.getText().toString());
+
+    }
+
+    private String strEmail, strPassword, strConfirm, strFirst, strLast;
+
+    public String getStrEmail() {
+        return strEmail;
+    }
+
+    public void setStrEmail(String strEmail) {
+        this.strEmail = strEmail;
+    }
+
+    public String getStrPassword() {
+        return strPassword;
+    }
+
+    public void setStrPassword(String strPassword) {
+        this.strPassword = strPassword;
+    }
+
+    public String getStrConfirm() {
+        return strConfirm;
+    }
+
+    public void setStrConfirm(String strConfirm) {
+        this.strConfirm = strConfirm;
+    }
+
+    public String getStrFirst() {
+        return strFirst;
+    }
+
+    public void setStrFirst(String strFirst) {
+        this.strFirst = strFirst;
+    }
+
+    public String getStrLast() {
+        return strLast;
+    }
+
+    public void setStrLast(String strLast) {
+        this.strLast = strLast;
     }
 }
