@@ -21,11 +21,92 @@ import java.io.IOException;
  */
 public class APIconnect extends AsyncTask<Void, Void, String> {
     private String URL = "http://192.168.0.132/TourismKKC/main/register";
+    private String URL_MAIN = "http://192.168.0.132/TourismKKC/main/";
     private String TAG = "CBNUKE_Dev";
-    private APIStatus apiStatus = new APIStatus();
+    private OkHttpClient okHttpClient = new OkHttpClient();
 
     public APIconnect() {
 
+    }
+
+    public APIStatus register(String user_email, String user_password, String user_fname, String user_lname) {
+        RequestBody formBody = new FormEncodingBuilder()
+                .add("user_email", user_email)
+                .add("user_password", user_password)
+                .add("user_fname", user_fname)
+                .add("user_lname", user_lname)
+                .build();
+
+        Request.Builder builder = new Request.Builder();
+        Request request = builder
+                .url(URL_MAIN + "register")
+                .post(formBody)
+                .build();
+
+        try {
+            Response response = okHttpClient.newCall(request).execute();
+            if (response.isSuccessful()) {
+                return checkAPIStatus(response.body().string());
+            } else {
+                Log.d(TAG, "Not Success - code in register : " + response.code());
+                return null;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.d(TAG, "ERROR in register : " + e.getMessage());
+            return null;
+        }
+    }
+
+    public APIStatus login(String user_email, String user_password) {
+        RequestBody formBody = new FormEncodingBuilder()
+                .add("user_email", user_email)
+                .add("user_password", user_password)
+                .build();
+
+        Request.Builder builder = new Request.Builder();
+        Request request = builder
+                .url(URL_MAIN + "login")
+                .post(formBody)
+                .build();
+
+        try {
+            Response response = okHttpClient.newCall(request).execute();
+            if (response.isSuccessful()) {
+                return checkAPIStatus(response.body().string());
+            } else {
+                Log.d(TAG, "Not Success - code in login : " + response.code());
+                return null;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.d(TAG, "ERROR in login : " + e.getMessage());
+            return null;
+        }
+    }
+
+    private APIStatus checkAPIStatus(String json_string) {
+        APIStatus apiStatus = new APIStatus();
+        try {
+            JSONObject jStatus = new JSONObject(json_string);
+            String status = jStatus.getString("status");
+            apiStatus.setStatus(status);
+            Log.d(TAG, "STATUS:" + status);
+
+            JSONObject objData = jStatus.getJSONObject("data");
+            String action = objData.getString("action");
+            apiStatus.setAction(action);
+            Log.d(TAG, "ACTION:" + action);
+
+            String reason = objData.getString("reason");
+            apiStatus.setReason(reason);
+            Log.d(TAG, "REASON:" + reason);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.d(TAG, "ERROR in checkAPIStatus : " + e.toString());
+        }
+
+        return apiStatus;
     }
 
     @Override
@@ -90,16 +171,13 @@ public class APIconnect extends AsyncTask<Void, Void, String> {
         try {
             JSONObject jStatus = new JSONObject(string);
             String status = jStatus.getString("status");
-            apiStatus.setStatus(status);
             Log.d(TAG, "STATUS:" + status);
 
             JSONObject objData = jStatus.getJSONObject("data");
             String action = objData.getString("action");
-            apiStatus.setAction(action);
             Log.d(TAG, "ACTION:" + action);
 
             String reason = objData.getString("reason");
-            apiStatus.setReason(reason);
             Log.d(TAG, "REASON:" + reason);
 
 //            JSONArray jArray = jObject.getJSONArray("data");
