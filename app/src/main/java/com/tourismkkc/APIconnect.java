@@ -15,20 +15,11 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 public class APIConnect extends AsyncTask<Void, Void, String> {
-
-<<<<<<< HEAD
-/**
- * Created by cbnuke on 11/23/15.
- */
-public class APIconnect extends AsyncTask<Void, Void, String> {
     private String URL = "http://192.168.0.132/TourismKKC/main/register";
     private String URL_MAIN = "http://192.168.0.132/TourismKKC/main/";
     private String TAG = "CBNUKE_Dev";
     private OkHttpClient okHttpClient = new OkHttpClient();
-=======
-    private String TAG = "DEBUG";
     private APIStatus apiStatus = new APIStatus();
->>>>>>> origin/master
 
     public APIConnect() {
 
