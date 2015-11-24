@@ -47,13 +47,8 @@ public class ActivityRegisterActivity extends Activity implements View.OnClickLi
 
                 editStr();
 
-                if (getStrEmail().isEmpty()) {
-/*false*/
-                    Toast.makeText(getApplicationContext(), "FALSE", Toast.LENGTH_LONG).show();
-                } else {
-/*true*/
-                    Toast.makeText(getApplicationContext(), "TRUE", Toast.LENGTH_LONG).show();
-                }
+                /*true*/
+                Toast.makeText(getApplicationContext(), "TRUE", Toast.LENGTH_LONG).show();
 
                 break;
             case R.id.register_btn_back:
