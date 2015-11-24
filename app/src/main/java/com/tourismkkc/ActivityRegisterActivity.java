@@ -48,8 +48,17 @@ public class ActivityRegisterActivity extends Activity implements View.OnClickLi
 
                 editStr();
 
-                /*true*/
-                Toast.makeText(getApplicationContext(), "TRUE", Toast.LENGTH_LONG).show();
+                if (getStrEmail().isEmpty() || getStrPassword().isEmpty() || getStrConfirm().isEmpty() || getStrFirst().isEmpty() || getStrLast().isEmpty()) {
+                    /* isEmpty = true */
+                    Toast.makeText(getApplicationContext(), "isEmpty: TRUE", Toast.LENGTH_LONG).show();
+                } else {
+                    /* isEmpty = false */
+                    if (getStrPassword().equals(getStrConfirm())) {
+                        Toast.makeText(getApplicationContext(), "PASSWORD: TRUE", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "PASSWORD: FALSE", Toast.LENGTH_LONG).show();
+                    }
+                }
 
                 //Connect API
                 DataRegister dataRegister = new DataRegister(strEmail, strPassword, strFirst, strLast);
