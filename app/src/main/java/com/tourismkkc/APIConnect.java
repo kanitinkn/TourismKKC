@@ -24,12 +24,12 @@ public class APIConnect {
 
     }
 
-    public APIStatus register(String user_email, String user_password, String user_fname, String user_lname) {
+    public APIStatus register(DataRegister dataRegister) {
         RequestBody formBody = new FormEncodingBuilder()
-                .add("user_email", user_email)
-                .add("user_password", user_password)
-                .add("user_fname", user_fname)
-                .add("user_lname", user_lname)
+                .add("user_email", dataRegister.getUser_email())
+                .add("user_password", dataRegister.getUser_password())
+                .add("user_fname", dataRegister.getUser_fname())
+                .add("user_lname", dataRegister.getUser_lname())
                 .build();
 
         Request.Builder builder = new Request.Builder();

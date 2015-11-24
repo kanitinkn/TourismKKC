@@ -2,6 +2,7 @@ package com.tourismkkc;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -49,6 +50,11 @@ public class ActivityRegisterActivity extends Activity implements View.OnClickLi
 
                 /*true*/
                 Toast.makeText(getApplicationContext(), "TRUE", Toast.LENGTH_LONG).show();
+
+                //Connect API
+                DataRegister dataRegister = new DataRegister(strEmail, strPassword, strFirst, strLast);
+                LoadAPI loadAPI = new LoadAPI();
+                loadAPI.execute(dataRegister);
 
                 break;
             case R.id.register_btn_back:
@@ -110,5 +116,21 @@ public class ActivityRegisterActivity extends Activity implements View.OnClickLi
 
     public void setStrLast(String strLast) {
         this.strLast = strLast;
+    }
+
+    class LoadAPI extends AsyncTask<DataRegister, Void, APIStatus> {
+        private APIConnect apiConnect = new APIConnect();
+        private APIStatus apiStatus = new APIStatus();
+
+        @Override
+        protected APIStatus doInBackground(DataRegister... params) {
+            apiStatus = apiConnect.register(params[0]);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(APIStatus result) {
+            Toast.makeText(getApplicationContext(), apiStatus.getReason(), Toast.LENGTH_LONG).show();
+        }
     }
 }
