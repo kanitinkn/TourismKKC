@@ -88,17 +88,47 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
-
         FacebookSdk.sdkInitialize(this.getApplicationContext());
-
-        callbackManager = CallbackManager.Factory.create();
-
+        initInstances();
+        initCallbackManager();
         getUserInfo();
 
         APIconnect api = new APIconnect();
         api.execute();
 
+        setContentView(R.layout.activity_main);
+
+        // create profileTracker
+        profileTracker = new
+
+                ProfileTracker() {
+                    @Override
+                    protected void onCurrentProfileChanged(Profile oldProfile,
+                                                           Profile currentProfile) {
+                        updateUI();
+                    }
+                }
+
+        ;
+
+        postLinkButton.setOnClickListener(new View.OnClickListener()
+
+                                          {
+                                              @Override
+                                              public void onClick(View v) {
+                                                  performPublish(PendingAction.POST_LINK);
+                                              }
+                                          }
+
+        );
+
+    }
+
+    private void initCallbackManager() {
+
+        callbackManager = CallbackManager.Factory.create();
         LoginManager.getInstance().registerCallback(callbackManager,
                 new FacebookCallback<LoginResult>() {
                     @Override
@@ -148,16 +178,14 @@ public class MainActivity extends AppCompatActivity
 
         );
 
-        setContentView(R.layout.activity_main);
+    }
+
+    private void initInstances() {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-
         setSupportActionBar(toolbar);
 
-        fab = (FloatingActionButton)
-
-                findViewById(R.id.fab);
-
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener()
 
                                {
@@ -179,66 +207,10 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        userName = (TextView)
-
-                findViewById(R.id.user_name);
-
-        profilePictureView = (ProfilePictureView)
-
-                findViewById(R.id.profile_picture);
-
-        postLinkButton = (Button)
-
-                findViewById(R.id.post_link_button);
-
-        postPictureButton = (Button)
-
-                findViewById(R.id.post_picture_button);
-
-
-        // create profileTracker
-        profileTracker = new
-
-                ProfileTracker() {
-                    @Override
-                    protected void onCurrentProfileChanged(Profile oldProfile,
-                                                           Profile currentProfile) {
-                        updateUI();
-                    }
-                }
-
-        ;
-
-        postLinkButton.setOnClickListener(new View.OnClickListener()
-
-                                          {
-                                              @Override
-                                              public void onClick(View v) {
-                                                  performPublish(PendingAction.POST_LINK);
-                                              }
-                                          }
-
-        );
+        userName = (TextView) findViewById(R.id.user_name);
+        profilePictureView = (ProfilePictureView) findViewById(R.id.profile_picture);
 
     }
-
-    /*private String getQuery(List<NameValuePair> params) throws UnsupportedEncodingException {
-        StringBuilder result = new StringBuilder();
-        boolean first = true;
-
-        for (NameValuePair pair : params) {
-            if (first)
-                first = false;
-            else
-                result.append("&");
-
-            result.append(URLEncoder.encode(pair.getName(), "UTF-8"));
-            result.append("=");
-            result.append(URLEncoder.encode(pair.getValue(), "UTF-8"));
-        }
-
-        return result.toString();
-    }*/
 
     // ชนิดของการโพสต์ที่รอดำเนินการ
     private enum PendingAction {

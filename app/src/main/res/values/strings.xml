@@ -6,6 +6,22 @@
 
     <string name="action_settings">Settings</string>
 
+    <!-- activity_login -->
+    <string name="login_edit_email">Email</string>
+    <string name="login_edit_password">Password</string>
+    <string name="login_btn_login">Login</string>
+    <string name="login_btn_register">Register</string>
+
+    <!-- activity_register-->
+    <string name="register_tv_title">Register</string>
+    <string name="register_edit_email">Email</string>
+    <string name="register_edit_password">Password</string>
+    <string name="register_edit_confirm">Confirm Password</string>
+    <string name="register_edit_first">First name</string>
+    <string name="register_edit_last">Last name</string>
+    <string name="register_btn_register">Register</string>
+    <string name="register_btn_back">Back</string>
+
     <!-- custom-->
     <string name="facebook_app_id">161226850898892</string>
 </resources>
