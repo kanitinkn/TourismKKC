@@ -60,8 +60,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         initCallbackManager();
         getUserInfo();
 
-        new APIConnect().execute();
-
         setContentView(R.layout.activity_main);
 
         profileTracker = new ProfileTracker() {
@@ -105,11 +103,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
                 );
                 Bundle bundle = new Bundle();
-                bundle.putString("fields", "id,name,email,gender, birthday");
-
-                //Run API
-                APIConnect api = new APIConnect();
-//                api.execute("http://tourismkkc.thaihubhosting.com/main/register");
+                bundle.putString("fields", "id,name,email,gender");
 
             }
 

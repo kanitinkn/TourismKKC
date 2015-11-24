@@ -47,7 +47,7 @@ public class ActivityRegisterActivity extends Activity implements View.OnClickLi
 
                 editStr();
 
-                if (getStrEmail().isEmpty() || getStrPassword().isEmpty() || getStrConfirm().isEmpty() || getStrFirst().isEmpty() || getStrLast().isEmpty()) {
+                if (getStrEmail().isEmpty()) {
 /*false*/
                     Toast.makeText(getApplicationContext(), "FALSE", Toast.LENGTH_LONG).show();
                 } else {
