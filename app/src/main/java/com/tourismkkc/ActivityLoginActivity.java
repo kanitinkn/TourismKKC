@@ -5,12 +5,14 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -40,6 +42,7 @@ public class ActivityLoginActivity extends Activity implements View.OnClickListe
     private CallbackManager callbackManager;
 
     private String keyHash;
+    private String TAG = "DEBUG";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,8 +136,8 @@ public class ActivityLoginActivity extends Activity implements View.OnClickListe
             for (Signature signature : info.signatures) {
                 MessageDigest md = MessageDigest.getInstance("SHA");
                 md.update(signature.toByteArray());
-                Log.d("KeyHash:- ", Base64.encodeToString(md.digest(), Base64.DEFAULT));
                 keyHash += Base64.encodeToString(md.digest(), Base64.DEFAULT);
+                Log.d(TAG, keyHash);
             }
         } catch (PackageManager.NameNotFoundException | NoSuchAlgorithmException ignored) {
 
@@ -164,6 +167,12 @@ public class ActivityLoginActivity extends Activity implements View.OnClickListe
         switch (v.getId()) {
 
             case R.id.login_btn_login:
+
+                editStr();
+                DataLogin dataLogin = new DataLogin(getStrEmail(), getStrPassword());
+                LoadApi loadApi = new LoadApi();
+                loadApi.execute(dataLogin);
+
                 break;
             case R.id.login_btn_register:
                 Intent intent = new Intent(getApplicationContext(), ActivityRegisterActivity.class);
@@ -171,6 +180,13 @@ public class ActivityLoginActivity extends Activity implements View.OnClickListe
                 break;
 
         }
+
+    }
+
+    private void editStr() {
+
+        setStrEmail(editTextEmail.getText().toString());
+        setStrPassword(editTextPassword.getText().toString());
 
     }
 
@@ -208,6 +224,50 @@ public class ActivityLoginActivity extends Activity implements View.OnClickListe
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
 
+    }
+
+    public String getStrEmail() {
+        return strEmail;
+    }
+
+    public void setStrEmail(String strEmail) {
+        this.strEmail = strEmail;
+    }
+
+    public String getStrPassword() {
+        return strPassword;
+    }
+
+    public void setStrPassword(String strPassword) {
+        this.strPassword = strPassword;
+    }
+
+    private String strEmail, strPassword;
+
+    class LoadApi extends AsyncTask<DataLogin, Void, APIStatus> {
+
+        APIConnect apiConnect = new APIConnect();
+        APIStatus apiStatus = new APIStatus();
+
+        @Override
+        protected APIStatus doInBackground(DataLogin... params) {
+
+            return apiStatus = apiConnect.login(params[0]);
+
+        }
+
+        @Override
+        protected void onPostExecute(APIStatus apiStatus) {
+
+            super.onPostExecute(apiStatus);
+            Toast.makeText(getApplicationContext(), apiStatus.getReason(), Toast.LENGTH_SHORT).show();
+
+            if (apiStatus.getStatus().equalsIgnoreCase("success")) {
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+            }
+
+        }
     }
 
 }

@@ -15,8 +15,8 @@ import java.io.IOException;
 
 public class APIConnect {
 
-//    private String URL_MAIN = "http://192.168.0.132/TourismKKC/main/";
-    private String URL_MAIN = "http://tourismkkc.thaihubhosting.com/main/";
+        private String URL_MAIN = "http://192.168.0.132/TourismKKC/main/";
+//    private String URL_MAIN = "http://tourismkkc.thaihubhosting.com/main/";
     private String TAG = "CBNUKE_Dev";
     private OkHttpClient okHttpClient = new OkHttpClient();
     private APIStatus apiStatus = new APIStatus();
@@ -54,10 +54,10 @@ public class APIConnect {
         }
     }
 
-    public APIStatus login(String user_email, String user_password) {
+    public APIStatus login(DataLogin dataLogin) {
         RequestBody formBody = new FormEncodingBuilder()
-                .add("user_email", user_email)
-                .add("user_password", user_password)
+                .add("user_email", dataLogin.getUser_email())
+                .add("user_password", dataLogin.getUser_password())
                 .build();
 
         Request.Builder builder = new Request.Builder();
