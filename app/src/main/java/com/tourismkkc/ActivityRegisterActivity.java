@@ -50,9 +50,6 @@ public class ActivityRegisterActivity extends Activity implements View.OnClickLi
                     if (getStrPassword().equals(getStrConfirm())) {
                         Toast.makeText(getApplicationContext(), "PASSWORD: TRUE", Toast.LENGTH_LONG).show();
                         //Connect API
-//                        DataRegister dataRegister = new DataRegister(strEmail, strPassword, strFirst, strLast);
-//                        LoadAPI loadAPI = new LoadAPI();
-//                        loadAPI.execute(dataRegister);
                         new LoadAPI().execute(new DataRegister(strEmail, strPassword, strFirst, strLast));
                     } else {
                         Toast.makeText(getApplicationContext(), "PASSWORD: FALSE", Toast.LENGTH_LONG).show();
@@ -60,8 +57,6 @@ public class ActivityRegisterActivity extends Activity implements View.OnClickLi
                 }
                 break;
             case R.id.register_btn_back:
-//                Intent intent = new Intent(getApplicationContext(), ActivityLoginActivity.class);
-//                startActivity(intent);
                 startActivity(new Intent(getApplicationContext(), ActivityLoginActivity.class));
                 break;
         }
@@ -132,8 +127,6 @@ public class ActivityRegisterActivity extends Activity implements View.OnClickLi
         protected void onPostExecute(APIStatus result) {
             Toast.makeText(getApplicationContext(), apiStatus.getReason(), Toast.LENGTH_LONG).show();
             if (apiStatus.getStatus().equalsIgnoreCase("success")) {
-//                Intent intent = new Intent(getApplicationContext(), ActivityLoginActivity.class);
-//                startActivity(intent);
                 startActivity(new Intent(getApplicationContext(), ActivityLoginActivity.class));
             }
         }

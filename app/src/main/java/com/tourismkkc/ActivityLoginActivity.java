@@ -84,9 +84,6 @@ public class ActivityLoginActivity extends Activity implements View.OnClickListe
                             String strLastName = response.getJSONObject().get("last_name").toString();
                             String strID = response.getJSONObject().get("id").toString();
                             Log.d(TAG, "getDataFromFacebook str : " + strEmail + " : " + strFirstName + " : " + strLastName + " : " + strID);
-//                            DataRegister dataRegister = new DataRegister(strEmail, "", strFirstName, strLastName, strID);
-//                            LoadAPIFacebookRegister loadAPIFacebookRegister = new LoadAPIFacebookRegister();
-//                            loadAPIFacebookRegister.execute(dataRegister);
                             new LoadAPIFacebookRegister().execute(new DataRegister(strEmail, "", strFirstName, strLastName, strID));
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -130,14 +127,9 @@ public class ActivityLoginActivity extends Activity implements View.OnClickListe
         switch (v.getId()) {
             case R.id.login_btn_login:
                 editStr();
-//                DataLogin dataLogin = new DataLogin(getStrEmail(), getStrPassword());
-//                LoadApi loadApi = new LoadApi();
-//                loadApi.execute(dataLogin);
                 new LoadApi().execute(new DataLogin(getStrEmail(), getStrPassword()));
                 break;
             case R.id.login_btn_register:
-//                Intent intent = new Intent(getApplicationContext(), ActivityRegisterActivity.class);
-//                startActivity(intent);
                 startActivity(new Intent(getApplicationContext(), ActivityRegisterActivity.class));
                 break;
         }
@@ -206,8 +198,6 @@ public class ActivityLoginActivity extends Activity implements View.OnClickListe
             super.onPostExecute(apiStatus);
             Toast.makeText(getApplicationContext(), apiStatus.getReason(), Toast.LENGTH_SHORT).show();
             if (apiStatus.getStatus().equalsIgnoreCase("success")) {
-//                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-//                startActivity(intent);
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
             }
         }
@@ -227,8 +217,6 @@ public class ActivityLoginActivity extends Activity implements View.OnClickListe
         protected void onPostExecute(APIStatus result) {
             Toast.makeText(getApplicationContext(), apiStatus.getReason(), Toast.LENGTH_LONG).show();
             if (apiStatus.getStatus().equalsIgnoreCase("success")) {
-//                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-//                startActivity(intent);
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
             }
         }
