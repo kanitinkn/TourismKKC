@@ -31,6 +31,7 @@ public class APIConnect {
                 .add("user_password", dataRegister.getUser_password())
                 .add("user_fname", dataRegister.getUser_fname())
                 .add("user_lname", dataRegister.getUser_lname())
+                .add("user_fb_id", dataRegister.getUser_fb_id())
                 .build();
 
         Request.Builder builder = new Request.Builder();

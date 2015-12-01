@@ -4,16 +4,23 @@ package com.tourismkkc;
  * Created by Amnart on 24/11/2558.
  */
 public class DataRegister {
-    private String user_email;
-    private String user_password;
-    private String user_fname;
-    private String user_lname;
+    private String user_email = "";
+    private String user_password = "";
+    private String user_fname = "";
+    private String user_lname = "";
+    private String user_fb_id = "";
 
     public DataRegister(String user_email, String user_password, String user_fname, String user_lname) {
         this.user_email = user_email;
         this.user_password = user_password;
         this.user_fname = user_fname;
         this.user_lname = user_lname;
+    }
+
+    public DataRegister(String user_email, String user_fname, String user_fb_id) {
+        this.user_email = user_email;
+        this.user_fname = user_fname;
+        this.user_fb_id = user_fb_id;
     }
 
     public String getUser_email() {
@@ -30,6 +37,10 @@ public class DataRegister {
 
     public String getUser_lname() {
         return user_lname;
+    }
+
+    public String getUser_fb_id() {
+        return user_fb_id;
     }
 
 

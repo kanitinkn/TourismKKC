@@ -26,17 +26,22 @@ import com.facebook.ProfileTracker;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.List;
 
 public class ActivityLoginActivity extends Activity implements View.OnClickListener {
 
     private EditText editTextEmail, editTextPassword;
     private Button buttonLogin, buttonRegister;
+    private LoginButton loginButton;
+    private List<String> PERMISSIONS = Arrays.asList("public_profile", "email");
 
     private ProfileTracker profileTracker;
     private CallbackManager callbackManager;
@@ -71,52 +76,51 @@ public class ActivityLoginActivity extends Activity implements View.OnClickListe
     }
 
     private void initCallbackManager() {
-
         callbackManager = CallbackManager.Factory.create();
-
-        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-
+        loginButton.setReadPermissions(PERMISSIONS);
+        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-
+                Log.d(TAG, "initCallbackManager : " + loginResult.toString());
                 updateUI();
+                GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
+                    @Override
+                    public void onCompleted(JSONObject object, GraphResponse response) {
+                        // Application code
+                        Log.d(TAG, "getDataFromFacebook : " + response.toString());
+                        try {
+                            String strID = response.getJSONObject().get("id").toString();
+                            String strEmail = response.getJSONObject().get("email").toString();
+                            String strName = response.getJSONObject().get("name").toString();
+                            Log.d(TAG, "getDataFromFacebook : " + strEmail);
 
-                GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(),
-                        new GraphRequest.GraphJSONObjectCallback() {
-                            @Override
-                            public void onCompleted(JSONObject object,
-                                                    GraphResponse response) {
-                                Log.d("LOG", "response:- " + response.toString());
-                                String email = null;
-                                try {
-                                    email = response.getJSONObject().get("email").toString();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                                Log.d("LOG", "email:- " + email);
-                            }
+
+                            DataRegister dataRegister = new DataRegister(strEmail,strName,strID);
+                            LoadAPIFacebookRegister loadAPIFacebookRegister = new LoadAPIFacebookRegister();
+                            loadAPIFacebookRegister.execute(dataRegister);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                );
-                Bundle bundle = new Bundle();
-                bundle.putString("fields", "id,name,email,gender");
-
+                    }
+                });
+                Bundle parameters = new Bundle();
+                parameters.putString("fields", "id,name,email,gender");
+                request.setParameters(parameters);
+                request.executeAsync();
             }
 
             @Override
             public void onCancel() {
-
+                Log.d(TAG, "initCallbackManager : onCancel");
                 updateUI();
-
             }
 
             @Override
             public void onError(FacebookException error) {
-
+                Log.d(TAG, "initCallbackManager : " + error.toString());
                 updateUI();
-
             }
         });
-
     }
 
     private void initInstances() {
@@ -125,6 +129,7 @@ public class ActivityLoginActivity extends Activity implements View.OnClickListe
         editTextPassword = (EditText) findViewById(R.id.login_edit_password);
         buttonLogin = (Button) findViewById(R.id.login_btn_login);
         buttonRegister = (Button) findViewById(R.id.login_btn_register);
+        loginButton = (LoginButton) findViewById(R.id.login_button);
 
     }
 
@@ -267,6 +272,26 @@ public class ActivityLoginActivity extends Activity implements View.OnClickListe
                 startActivity(intent);
             }
 
+        }
+    }
+
+    class LoadAPIFacebookRegister extends AsyncTask<DataRegister, Void, APIStatus> {
+        private APIConnect apiConnect = new APIConnect();
+        private APIStatus apiStatus = new APIStatus();
+
+        @Override
+        protected APIStatus doInBackground(DataRegister... params) {
+            apiStatus = apiConnect.register(params[0]);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(APIStatus result) {
+            Toast.makeText(getApplicationContext(), apiStatus.getReason(), Toast.LENGTH_LONG).show();
+            if(apiStatus.getStatus().equalsIgnoreCase("success")){
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+            }
         }
     }
 
