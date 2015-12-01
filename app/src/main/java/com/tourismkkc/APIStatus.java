@@ -1,11 +1,11 @@
 package com.tourismkkc;
 
-import com.google.gson.annotations.SerializedName;
-
-/**
- * Created by Amnart on 24/11/2558.
- */
 public class APIStatus {
+
+    private String status;
+    private String action;
+    private String reason;
+
     public String getStatus() {
         return status;
     }
@@ -29,8 +29,4 @@ public class APIStatus {
     public void setReason(String reason) {
         this.reason = reason;
     }
-
-    private String status;
-    private String action;
-    private String reason;
 }

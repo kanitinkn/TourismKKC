@@ -18,29 +18,19 @@ android {
         }
     }
 
-//    enabled dataBinding
     dataBinding {
         enabled = true
     }
 }
 
-//    add repositories using facebook sdk
-repositories {
-    mavenCentral()
-}
+repositories { mavenCentral() }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
-
-//    add library using facebook sdk
     compile 'com.facebook.android:facebook-android-sdk:4.7.0'
-
-//    OkHttp
     compile 'com.squareup.okhttp:okhttp:2.6.0'
-
-//    GSON
     compile 'com.google.code.gson:gson:2.4'
 }

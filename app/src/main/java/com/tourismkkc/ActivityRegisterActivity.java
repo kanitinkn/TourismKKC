@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,43 +11,37 @@ import android.widget.Toast;
 
 public class ActivityRegisterActivity extends Activity implements View.OnClickListener {
 
-    private EditText editTextEmail, editTextpassword, editTextConfirm, editTextFirst, editTextLast;
+    private EditText editTextEmail, editTextPassword, editTextConfirm, editTextFirst, editTextLast;
     private Button buttonRegister, buttonBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_register);
-
+        initial();
         initInstances();
-
         buttonRegister.setOnClickListener(this);
         buttonBack.setOnClickListener(this);
+    }
 
+    private void initial() {
+        setContentView(R.layout.activity_register);
     }
 
     private void initInstances() {
-
         editTextEmail = (EditText) findViewById(R.id.register_edit_email);
-        editTextpassword = (EditText) findViewById(R.id.register_edit_password);
+        editTextPassword = (EditText) findViewById(R.id.register_edit_password);
         editTextConfirm = (EditText) findViewById(R.id.register_edit_confirm);
         editTextFirst = (EditText) findViewById(R.id.register_edit_first);
         editTextLast = (EditText) findViewById(R.id.register_edit_last);
         buttonRegister = (Button) findViewById(R.id.register_btn_register);
         buttonBack = (Button) findViewById(R.id.register_btn_back);
-
     }
 
     @Override
     public void onClick(View v) {
-
         switch (v.getId()) {
-
             case R.id.register_btn_register:
-
                 editStr();
-
                 if (getStrEmail().isEmpty() || getStrPassword().isEmpty() || getStrConfirm().isEmpty() || getStrFirst().isEmpty() || getStrLast().isEmpty()) {
                     /* isEmpty = true */
                     Toast.makeText(getApplicationContext(), "isEmpty: TRUE", Toast.LENGTH_LONG).show();
@@ -56,34 +49,30 @@ public class ActivityRegisterActivity extends Activity implements View.OnClickLi
                     /* isEmpty = false */
                     if (getStrPassword().equals(getStrConfirm())) {
                         Toast.makeText(getApplicationContext(), "PASSWORD: TRUE", Toast.LENGTH_LONG).show();
-
                         //Connect API
-                        DataRegister dataRegister = new DataRegister(strEmail, strPassword, strFirst, strLast);
-                        LoadAPI loadAPI = new LoadAPI();
-                        loadAPI.execute(dataRegister);
-
+//                        DataRegister dataRegister = new DataRegister(strEmail, strPassword, strFirst, strLast);
+//                        LoadAPI loadAPI = new LoadAPI();
+//                        loadAPI.execute(dataRegister);
+                        new LoadAPI().execute(new DataRegister(strEmail, strPassword, strFirst, strLast));
                     } else {
                         Toast.makeText(getApplicationContext(), "PASSWORD: FALSE", Toast.LENGTH_LONG).show();
                     }
                 }
                 break;
             case R.id.register_btn_back:
-                Intent intent = new Intent(getApplicationContext(), ActivityLoginActivity.class);
-                startActivity(intent);
+//                Intent intent = new Intent(getApplicationContext(), ActivityLoginActivity.class);
+//                startActivity(intent);
+                startActivity(new Intent(getApplicationContext(), ActivityLoginActivity.class));
                 break;
-
         }
-
     }
 
     private void editStr() {
-
         setStrEmail(editTextEmail.getText().toString());
-        setStrPassword(editTextpassword.getText().toString());
+        setStrPassword(editTextPassword.getText().toString());
         setStrConfirm(editTextConfirm.getText().toString());
         setStrFirst(editTextFirst.getText().toString());
         setStrLast(editTextLast.getText().toString());
-
     }
 
     private String strEmail, strPassword, strConfirm, strFirst, strLast;
@@ -129,6 +118,7 @@ public class ActivityRegisterActivity extends Activity implements View.OnClickLi
     }
 
     class LoadAPI extends AsyncTask<DataRegister, Void, APIStatus> {
+
         private APIConnect apiConnect = new APIConnect();
         private APIStatus apiStatus = new APIStatus();
 
@@ -141,9 +131,10 @@ public class ActivityRegisterActivity extends Activity implements View.OnClickLi
         @Override
         protected void onPostExecute(APIStatus result) {
             Toast.makeText(getApplicationContext(), apiStatus.getReason(), Toast.LENGTH_LONG).show();
-            if(apiStatus.getStatus().equalsIgnoreCase("success")){
-                Intent intent = new Intent(getApplicationContext(), ActivityLoginActivity.class);
-                startActivity(intent);
+            if (apiStatus.getStatus().equalsIgnoreCase("success")) {
+//                Intent intent = new Intent(getApplicationContext(), ActivityLoginActivity.class);
+//                startActivity(intent);
+                startActivity(new Intent(getApplicationContext(), ActivityLoginActivity.class));
             }
         }
     }
